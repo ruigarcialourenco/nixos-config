@@ -6,22 +6,29 @@
       ./hardware-configuration.nix
     ];
 
-  nixpkgs.config.allowUnfree = true;
-
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 0;
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
-  networking.dhcpcd.wait = "background";
 
   systemd.services.NetworkManager-wait-online.enable = false;
 
   time.timeZone = "Europe/Lisbon";
   i18n.defaultLocale = "en_US.UTF-8";
+
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "pt_PT.UTF-8";
+    LC_IDENTIFICATION = "pt_PT.UTF-8";
+    LC_MEASUREMENT = "pt_PT.UTF-8";
+    LC_MONETARY = "pt_PT.UTF-8";
+    LC_NAME = "pt_PT.UTF-8";
+    LC_NUMERIC = "pt_PT.UTF-8";
+    LC_PAPER = "pt_PT.UTF-8";
+    LC_TELEPHONE = "pt_PT.UTF-8";
+    LC_TIME = "pt_PT.UTF-8";
+  };
 
   console.keyMap = "pt-latin9";
 
@@ -51,13 +58,51 @@
       "nerworkmanager"
       "wheel"
     ];
+    shell = pkgs.zsh;
   };
 
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  programs.firefox.enable = true;
+  services.jellyfin = {
+    enable = true;
+    openFirewall = true;
+    user = "rui";
+  };
+
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      ngc = "nix-collect-garbage --delete-old && sudo nix-collect-garbage -d && sudo /run/current-system/bin/switch-to-configuration boot";
+    };
+
+    histSize = 10000;
+
+    ohMyZsh = {
+      enable = true;
+      theme = "robbyrussell";
+      plugins = ["git"];
+    };
+  };
+
+  programs.foot = {
+    enable = true;
+    theme = "tokyonight-night";
+    settings = {
+      main = {
+        font = "monospace:size=12";
+        initial-window-size-pixels="960x640";
+      };
+      scrollback = {
+        lines=100000;
+      };
+    };
+  };
 
   programs.git = {
     enable = true;
@@ -72,39 +117,36 @@
     };
   };
 
-  programs.foot = {
-    enable = true;
-    theme = "tokyonight-night";
-    settings = {
-      main = {
-        font = "monospace:size=12";
-        initial-window-size-pixels="900x600";
-      };
-      scrollback = {
-        lines=100000;
-      };
-    };
-  };
-
   programs.vscode = {
     enable = true;
-    defaultEditor = true;
+    extensions = with pkgs.vscode-extensions; [
+      eamodio.gitlens
+      pkief.material-icon-theme
+    ];
   };
 
   programs.gamemode.enable = true;
 
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+    args = [
+      "--rt"
+      "--expose-wayland"
+    ];
+  };
+
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = false;
+    remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = false;
     gamescopeSession.enable = false;
   };
 
   environment.systemPackages = with pkgs; [
-    btop
+    brave
     discord
-    heroic
-    htop
+    kdePackages.kcalc
     lutris
     mangohud
     qbittorrent
@@ -112,9 +154,16 @@
     unzip
     vim
     vlc
-    vscode
+    winetricks
+    wineWow64Packages.staging
     wget
   ];
+
+  environment.variables = {
+    NIXOS_OZONE_WL = "1";
+  };
+
+  nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
