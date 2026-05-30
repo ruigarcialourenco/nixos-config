@@ -17,7 +17,6 @@
 
   time.timeZone = "Europe/Lisbon";
   i18n.defaultLocale = "en_US.UTF-8";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "pt_PT.UTF-8";
     LC_IDENTIFICATION = "pt_PT.UTF-8";
@@ -32,11 +31,13 @@
 
   console.keyMap = "pt-latin9";
 
+  services.xserver.enable = false;
+  services.xserver.xkb.layout = "pt";
+
   hardware.graphics = {
     enable = true;
-    enable32Bit = true;
   };
-
+  
   services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
@@ -44,7 +45,7 @@
     powerManagement.enable = true;
     powerManagement.finegrained = false;
     open = true;
-    nvidiaSettings = false;
+    nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
@@ -53,6 +54,7 @@
 
   users.users.rui = {
     isNormalUser = true;
+    description = "Rui Lourenço";
     extraGroups = [
       "gamemode"
       "nerworkmanager"
@@ -61,8 +63,7 @@
     shell = pkgs.zsh;
   };
 
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  services.displayManager.plasma-login-manager.enable = true;
   services.desktopManager.plasma6.enable = true;
 
   services.jellyfin = {
@@ -146,7 +147,6 @@
   environment.systemPackages = with pkgs; [
     brave
     discord
-    kdePackages.kcalc
     lutris
     mangohud
     qbittorrent
@@ -163,10 +163,17 @@
     NIXOS_OZONE_WL = "1";
   };
 
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    noto-fonts-color-emoji
+  ];
+
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  system.stateVersion = "25.11";
+  system.stateVersion = "26.05";
 
 }
