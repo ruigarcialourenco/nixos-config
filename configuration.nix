@@ -66,6 +66,13 @@
   services.displayManager.plasma-login-manager.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    elisa
+    kate
+    konsole
+    qrca
+  ];
+
   services.jellyfin = {
     enable = true;
     openFirewall = true;
@@ -147,9 +154,11 @@
   environment.systemPackages = with pkgs; [
     brave
     discord
+    kdePackages.kcalc
     lutris
     mangohud
     qbittorrent
+    thunderbird
     unrar
     unzip
     vim
